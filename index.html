@@ -270,6 +270,12 @@
     border: 1px solid var(--border); flex: 0 0 auto; padding: 14px 20px;
   }
   .btn-skip:hover { color: var(--text); border-color: var(--muted); }
+  .btn-back {
+    background: var(--surface2); color: var(--muted);
+    border: 1px solid var(--border); flex: 0 0 auto; padding: 14px 20px;
+  }
+  .btn-back:hover { color: var(--text); border-color: var(--muted); }
+  .btn-back:disabled { opacity: 0.2; cursor: default; pointer-events: none; }
 
   /* FEEDBACK */
   .feedback-bar {
@@ -460,6 +466,7 @@
       </div>
 
       <div class="btn-row">
+        <button class="btn btn-back" id="btn-back">← Atrás</button>
         <button class="btn btn-primary" id="btn-check">Comprobar</button>
         <button class="btn btn-skip" id="btn-next">Siguiente →</button>
       </div>
@@ -1367,6 +1374,7 @@ function renderQuestion() {
 
   // Progress
   document.getElementById('progress-label').textContent = `${qIndex + 1} / ${queue.length}`;
+  document.getElementById('btn-back').disabled = qIndex === 0;
   document.getElementById('progress-fill').style.width = `${(qIndex / queue.length) * 100}%`;
 
   document.getElementById('btn-check').textContent = 'Comprobar';
@@ -1534,6 +1542,21 @@ document.getElementById('tabs').addEventListener('click', e => {
 document.getElementById('btn-check').addEventListener('click', () => {
   if (answered) nextQuestion();
   else checkAnswer();
+});
+
+document.getElementById('btn-back').addEventListener('click', () => {
+  if (qIndex === 0) return;
+  // save nota of current before going back
+  if (qIndex < queue.length) {
+    const e = queue[qIndex];
+    const rec = getRecord(e.calle);
+    rec.nota = document.getElementById('nota-textarea').value;
+    saveRecord(e.calle, rec);
+  }
+  qIndex--;
+  answered = false;
+  document.getElementById('feedback-bar').classList.remove('show');
+  renderQuestion();
 });
 
 document.getElementById('btn-next').addEventListener('click', () => {
